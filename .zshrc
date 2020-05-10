@@ -99,9 +99,19 @@ source $ZSH/oh-my-zsh.sh
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
-export DISPLAY=localhost:0.0
+CHECKWSL=$(/mnt/c/Windows/System32/wsl.exe --list --verbose)
+if [ $? -ne 0 ]
+then
+  export DISPLAY=localhost:0.0
+else
+  WSLVERSION=$(echo $CHECKWSL | head -n 2 | awk -e '{ print $NF }')
+  if [ $WSLVERSION = "2" ]
+  then
+    export DISPLAY=$(cat /etc/resolve.conf | grep nameserver | head -n 1 | cut -d' ' -f2):0.0
+  fi
+fi
+
 export EDITOR=vim
 bindkey -v
 
-export PATH="$HOME/bin:$HOME/.rbenv/bin:$PATH"
-eval "$(rbenv init -)"
+export PATH="$HOME/bin:$PATH"
