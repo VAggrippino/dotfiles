@@ -1,0 +1,3 @@
+colorscheme desert
+set guifont=InputMono_Medium:h14:cANSI:qDRAFT
+set columns=120
