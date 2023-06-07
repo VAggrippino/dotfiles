@@ -1,0 +1,9 @@
+[user]
+  email = 195491+VAggrippino@users.noreply.github.com
+  name = Vince Aggrippino
+[core]
+  pager = less -F -X
+  autocrlf = input
+
+[credential]
+	helper = store
