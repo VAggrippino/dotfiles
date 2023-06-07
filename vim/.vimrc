@@ -9,5 +9,6 @@ set ruler
 set number
 set incsearch
 set hlsearch
+set equalalways
 set fileformat=unix
-set listchars=eol:$,tab:>-,space:·
+
