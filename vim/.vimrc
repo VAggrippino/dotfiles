@@ -10,5 +10,4 @@ set number
 set incsearch
 set hlsearch
 set equalalways
-set fileformat=unix
 
