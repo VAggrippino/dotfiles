@@ -1,3 +1,46 @@
+# Replacement for auto-update to accommodate the dotfiles submodule
+OHMYZSH_UPDATE_FILE="$HOME/.ohmyzsh-updated.txt"
+DOTFILES="$HOME/dotfiles"
+OHMYZSH_SUBMODULE="zsh/.oh-my-zsh"
+
+# Update the oh-my-zsh submodule
+function submodule_update() {
+  git -C "$DOTFILES" submodule update "$OHMYZSH_SUBMODULE"
+  return
+}
+
+# Generate a human-readable update message for the content of the update file
+function ohmyzsh_update_message() {
+  echo "The OhMyZsh submodule was last updated on $(date +%F)"
+}
+
+# If the update file doesn't exist, update the submodule and update file
+if [[ ! -f "$OHMYZSH_UPDATE_FILE" ]]; then
+  echo "$OHMYZSH_SUBMODULE file not found. Updating OhMyZsh submodule..."
+  submodule_update && ohmyzsh_update_message > $OHMYZSH_UPDATE_FILE
+
+# Otherwise update if the specified number of days has passed
+else
+  # Anonymous function allows locally scoped variables
+  function {
+    local UPDATE_TIMESTAMP=$(stat --printf %Y $OHMYZSH_UPDATE_FILE)
+    local CURRENT_TIMESTAMP=$(date +%s)
+
+    # Change DAYS to update more or less frequently
+    local DAYS=14
+    local SECONDS=$((DAYS * 24 * 60 * 60))
+
+    # If more than ${DAYS} have passed since the last update, update the
+    # submodule and update tracking file
+    if [[ $((CURRENT_TIMESTAMP - SECONDS)) -ge $UPDATE_TIMESTAMP ]]; then
+      echo "The OhMyZsh submodule hasn't been updated in at least $DAYS days. Running update now..."
+      submodule_update && ohmyzsh_update_message > $OHMYZSH_UPDATE_FILE
+    fi
+  }
+fi
+
+## ↑ Placed before the Powerlevel10k Instant prompt to avoid error from Powerlevel10k
+
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
 # Initialization code that may require console input (password prompts, [y/n]
 # confirmations, etc.) must go above this block; everything else may go below.
@@ -34,7 +77,7 @@ ZSH_THEME="powerlevel10k/powerlevel10k"
 # HYPHEN_INSENSITIVE="true"
 
 # Uncomment the following line to disable bi-weekly auto-update checks.
-# DISABLE_AUTO_UPDATE="true"
+DISABLE_AUTO_UPDATE="true"
 
 # Uncomment the following line to automatically update without prompting.
 # DISABLE_UPDATE_PROMPT="true"
