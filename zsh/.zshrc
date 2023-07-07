@@ -1,42 +1,65 @@
 # Replacement for auto-update to accommodate the dotfiles submodule
-OHMYZSH_UPDATE_FILE="$HOME/.ohmyzsh-updated.txt"
-DOTFILES="$HOME/dotfiles"
-OHMYZSH_SUBMODULE="zsh/.oh-my-zsh"
+dotfiles="$HOME/dotfiles"
+ohmyzsh_update_file="$dotfiles/.ohmyzsh-updated.txt"
+ohmyzsh_submodule="zsh/.oh-my-zsh"
 
-# Update the oh-my-zsh submodule
-function submodule_update() {
-  git -C "$DOTFILES" submodule update "$OHMYZSH_SUBMODULE"
-  return
+function update_ohmyzsh_submodule() {
+    printf "Updating OhMyZsh submodule in $dotfiles/$ohmyzsh_submodule...\n\n"
+    # Without --remote, git would only fetch the branch/commit that was latest
+    # when the submodule was last added to the repo
+    git -C "$dotfiles" submodule update --remote "$ohmyzsh_submodule"
+
+    local update_status=$?
+
+    # Only update the dotfiles repo if the submodule update was successful
+    if [[ $update_status -eq 0 ]]; then
+        # If the OhMyZsh project has been updated, this will link its latest
+        # commit to the dotfiles repo
+        # If there were no updates, there will be a "nothing to commit"
+        # message, but nothing will be changed
+        git -C "$dotfiles" add "$ohmyzsh_submodule"
+        git -C "$dotfiles" commit -m "Automatically updated OhMyZsh submodule"
+        git -C "$dotfiles" push
+    fi
+
+    return $update_status
 }
 
 # Generate a human-readable update message for the content of the update file
 function ohmyzsh_update_message() {
-  echo "The OhMyZsh submodule was last updated on $(date +%F)"
+    echo "Time of OhMyZsh submodule update: $(date --iso-8601='seconds')"
 }
 
-# If the update file doesn't exist, update the submodule and update file
-if [[ ! -f "$OHMYZSH_UPDATE_FILE" ]]; then
-  echo "$OHMYZSH_SUBMODULE file not found. Updating OhMyZsh submodule..."
-  submodule_update && ohmyzsh_update_message > $OHMYZSH_UPDATE_FILE
+perform_ohmyzsh_update=""
+# If the update file doesn't exist or it hasn't been updated in the specified
+# number of days, update the OhMyZsh submodule and the update file
+if [[ ! -f "$ohmyzsh_update_file" ]]; then
+    echo "$ohmyzsh_submodule file not found."
+    perform_ohmyzsh_update="yes"
 
-# Otherwise update if the specified number of days has passed
 else
-  # Anonymous function allows locally scoped variables
-  function {
-    local UPDATE_TIMESTAMP=$(stat --printf %Y $OHMYZSH_UPDATE_FILE)
-    local CURRENT_TIMESTAMP=$(date +%s)
+    # Anonymous function allows locally scoped variables
+    function {
+        local update_timestamp=$(stat --printf %Y $ohmyzsh_update_file)
+        local current_timestamp=$(date +%s)
 
-    # Change DAYS to update more or less frequently
-    local DAYS=14
-    local SECONDS=$((DAYS * 24 * 60 * 60))
+        # Change DAYS to update more or less frequently
+        local days=14
+        local seconds=$((days * 24 * 60 * 60))
 
-    # If more than ${DAYS} have passed since the last update, update the
-    # submodule and update tracking file
-    if [[ $((CURRENT_TIMESTAMP - SECONDS)) -ge $UPDATE_TIMESTAMP ]]; then
-      echo "The OhMyZsh submodule hasn't been updated in at least $DAYS days. Running update now..."
-      submodule_update && ohmyzsh_update_message > $OHMYZSH_UPDATE_FILE
+        # If more than ${days} have passed since the last update, update the
+        # submodule and update tracking file
+        if [[ $((current_timestamp - seconds)) -ge $update_timestamp ]]; then
+            printf "The OhMyZsh submodule hasn't been updated in at least $days days.\n"
+            perform_ohmyzsh_update="yes"
+        fi
+    }
+fi
+
+if [[ "$perform_ohmyzsh_update" == "yes" ]]; then
+    if update_ohmyzsh_submodule; then
+        ohmyzsh_update_message |tee $ohmyzsh_update_file
     fi
-  }
 fi
 
 ## ↑ Placed before the Powerlevel10k Instant prompt to avoid error from Powerlevel10k
@@ -176,7 +199,7 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
-export PATH="$PATH:$HOME/bin"
+export PATH="$HOME/bin:$PATH"
 export CDPATH="$CDPATH:$HOME/dev"
 
 #export PAGER="/bin/sh -c \"col -b -x | nvim -R \
