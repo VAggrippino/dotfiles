@@ -221,3 +221,25 @@ export BAT_PAGER=less
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+# The following lines were added by compinstall
+
+zstyle ':completion:*' auto-description 'specify: %d'
+zstyle ':completion:*' completer _expand _complete _ignored _match _approximate
+zstyle ':completion:*' completions 1
+zstyle ':completion:*' format 'Completing %d'
+zstyle ':completion:*' glob 1
+zstyle ':completion:*' insert-unambiguous false
+zstyle ':completion:*' list-colors ''
+zstyle ':completion:*' matcher-list '' 'm:{[:lower:]}={[:upper:]}' 'm:{[:lower:][:upper:]}={[:upper:][:lower:]}'
+zstyle ':completion:*' match-original both
+zstyle ':completion:*' max-errors 2
+zstyle ':completion:*' menu select=1
+zstyle ':completion:*' original true
+zstyle ':completion:*' preserve-prefix '//[^/]##/'
+zstyle ':completion:*' select-prompt %SScrolling active: %l matches, %p%s
+zstyle ':completion:*' substitute 1
+zstyle :compinstall filename '/home/vaggrippino/.zshrc'
+
+autoload -Uz compinit
+compinit
+# End of lines added by compinstall
