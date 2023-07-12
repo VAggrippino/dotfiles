@@ -13,3 +13,18 @@
 [submodule "nvm/.nvm"]
 	path = nvm/.nvm
 	url = git@github.com:nvm-sh/nvm.git
+[submodule "tmux/.tmux/plugins/dracula-tmux"]
+	path = tmux/.tmux/plugins/dracula-tmux
+	url = git@github.com:dracula/tmux.git
+[submodule "tmux/.tmux/plugins/tmux-pain-control"]
+	path = tmux/.tmux/plugins/tmux-pain-control
+	url = git@github.com:tmux-plugins/tmux-pain-control.git
+[submodule "tmux/.tmux/plugins/tmux-sensible"]
+	path = tmux/.tmux/plugins/tmux-sensible
+	url = git@github.com:tmux-plugins/tmux-sensible.git
+[submodule "tmux/.tmux/plugins/tmux-window-name"]
+	path = tmux/.tmux/plugins/tmux-window-name
+	url = git@github.com:ofirgall/tmux-window-name.git
+[submodule "tmux/.tmux/plugins/vim-tmux-navigator"]
+	path = tmux/.tmux/plugins/vim-tmux-navigator
+	url = git@github.com:christoomey/vim-tmux-navigator.git
