@@ -1,10 +1,17 @@
 # Replacement for auto-update to accommodate the dotfiles submodule
 dotfiles="$HOME/dotfiles"
-ohmyzsh_update_file="$dotfiles/.ohmyzsh-updated.txt"
+ohmyzsh_update_file="$dotfiles/ohmyzsh-updated.txt"
 ohmyzsh_submodule="zsh/.oh-my-zsh"
+ohmyzsh_custom="omzcustom/.oh-my-zsh/custom"
 
-function update_ohmyzsh_submodule() {
+function update_ohmyzsh() {
     printf "Updating OhMyZsh submodule in $dotfiles/$ohmyzsh_submodule...\n\n"
+
+    # This shouldn't do anything if dotfiles was cloned properly, but might be
+    # helpful if the dotfiles repo was cloned without initing and updating the
+    # submodules
+    git -C "$dotfiles" init "$ohmyzsh_submodule"
+
     # Without --remote, git would only fetch the branch/commit that was latest
     # when the submodule was last added to the repo
     git -C "$dotfiles" submodule update --remote "$ohmyzsh_submodule"
@@ -25,40 +32,92 @@ function update_ohmyzsh_submodule() {
     return $update_status
 }
 
-# Generate a human-readable update message for the content of the update file
-function ohmyzsh_update_message() {
-    echo "Time of OhMyZsh submodule update: $(date --iso-8601='seconds')"
+function update_omzcustom() {
+    printf "Updating OhMyZsh plugins...\n"
+
+    local update_status
+    local summary_update_status
+    summary_update_status=0
+
+    # Loop over the OhMyZsh plugins and themes, update each one, then commit
+    # changes to the repository
+    prefix="$dotfiles/$ohmyzsh_custom"
+    for fullpath in "$prefix"/plugins/* "$prefix"/themes/*; do
+        relativepath=${fullpath#"$dotfiles/"}
+
+        printf "Updating $relativepath ...\n"
+
+        # This shouldn't do anything if dotfiles was cloned properly, but it
+        # will be helpful if the repo was cloned without initing and updating
+        # the submodules
+        git -C "$dotfiles" submodule init "$relativepath"
+
+        # --remote uses the submodule project's latest commit rather than just
+        # the latest version in dotfiles
+        git -C "$dotfiles" submodule update --remote "$relativepath"
+        update_status=$?
+        summary_update_status=$((summary_update_status + update_status))
+
+        # Only update the repository if the update was successful
+        if [[ $update_status -eq 0 ]]; then
+            # If the plugin has been updated, this will link its latest commit
+            # to the dotfiles repo
+            # If there were no updates, there will be a "nothing to commit"
+            # message, but nothing will be changed
+            git -C "$dotfiles" add "$relativepath"
+            git -C "$dotfiles" commit  -m "Automatically updated OhMyZsh plugin submodule for $(basename "$relativepath")"
+            git -C "$dotfiles" push
+        fi
+    done
+
+    # This will be 0 if all the udpates were successful
+    return $summary_update_status
 }
 
-perform_ohmyzsh_update=""
-# If the update file doesn't exist or it hasn't been updated in the specified
-# number of days, update the OhMyZsh submodule and the update file
-if [[ ! -f "$ohmyzsh_update_file" ]]; then
-    echo "$ohmyzsh_update_file file not found."
-    perform_ohmyzsh_update="yes"
+# Generate a human-readable update message for the content of the update file
+function ohmyzsh_update_message() {
+    echo "Time of last update for the OhMyZsh submodule and OhMyZsh plugins/themes: $(date --iso-8601='seconds')"
+}
 
-else
-    # Anonymous function allows locally scoped variables
-    function {
-        local update_timestamp=$(stat --printf %Y $ohmyzsh_update_file)
-        local current_timestamp=$(date +%s)
+# Check that the dotfiles directory exists. If it doesn't, then this .zshrc
+# must've been copied by itself
+if [ -d $dotfiles ]; then
+    # Uncomment the following line to disable bi-weekly auto-update checks.
+    DISABLE_AUTO_UPDATE="true"
 
-        # Change DAYS to update more or less frequently
-        local days=14
-        local seconds=$((days * 24 * 60 * 60))
+    # If the update file doesn't exist or it hasn't been updated in the
+    # specified number of days, update the OhMyZsh submodule and the update
+    # file
+    perform_ohmyzsh_update=""
+    if [[ ! -f "$ohmyzsh_update_file" ]]; then
+        echo "$ohmyzsh_update_file file not found."
+        perform_ohmyzsh_update="yes"
 
-        # If more than ${days} have passed since the last update, update the
-        # submodule and update tracking file
-        if [[ $((current_timestamp - seconds)) -ge $update_timestamp ]]; then
-            printf "The OhMyZsh submodule hasn't been updated in at least $days days.\n"
-            perform_ohmyzsh_update="yes"
+    else
+        # Anonymous function allows locally scoped variables
+        function {
+            local update_timestamp=$(stat --printf %Y $ohmyzsh_update_file)
+            local current_timestamp=$(date +%s)
+
+            # Change DAYS to update more or less frequently
+            local days=14
+            local seconds=$((days * 24 * 60 * 60))
+
+            # If more than ${days} have passed since the last update, update the
+            # submodule and plugins/themes, then update the updatetracking file
+            if [[ $((current_timestamp - seconds)) -ge $update_timestamp ]]; then
+                printf "The OhMyZsh submodule hasn't been updated in at least $days days.\n"
+                perform_ohmyzsh_update="yes"
+            fi
+        }
+    fi
+
+    if [[ "$perform_ohmyzsh_update" == "yes" ]]; then
+        if update_ohmyzsh && update_omzcustom; then
+            ohmyzsh_update_message | tee $ohmyzsh_update_file
+        else
+            echo "Return statuses were not all 0. Check output and perform updates manually."
         fi
-    }
-fi
-
-if [[ "$perform_ohmyzsh_update" == "yes" ]]; then
-    if update_ohmyzsh_submodule; then
-        ohmyzsh_update_message | tee $ohmyzsh_update_file
     fi
 fi
 
@@ -98,9 +157,6 @@ ZSH_THEME="powerlevel10k/powerlevel10k"
 # Uncomment the following line to use hyphen-insensitive completion.
 # Case-sensitive completion must be off. _ and - will be interchangeable.
 # HYPHEN_INSENSITIVE="true"
-
-# Uncomment the following line to disable bi-weekly auto-update checks.
-DISABLE_AUTO_UPDATE="true"
 
 # Uncomment the following line to automatically update without prompting.
 # DISABLE_UPDATE_PROMPT="true"
