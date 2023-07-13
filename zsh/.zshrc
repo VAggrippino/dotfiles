@@ -34,7 +34,7 @@ perform_ohmyzsh_update=""
 # If the update file doesn't exist or it hasn't been updated in the specified
 # number of days, update the OhMyZsh submodule and the update file
 if [[ ! -f "$ohmyzsh_update_file" ]]; then
-    echo "$ohmyzsh_submodule file not found."
+    echo "$ohmyzsh_update_file file not found."
     perform_ohmyzsh_update="yes"
 
 else
@@ -58,7 +58,7 @@ fi
 
 if [[ "$perform_ohmyzsh_update" == "yes" ]]; then
     if update_ohmyzsh_submodule; then
-        ohmyzsh_update_message |tee $ohmyzsh_update_file
+        ohmyzsh_update_message | tee $ohmyzsh_update_file
     fi
 fi
 
