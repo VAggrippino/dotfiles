@@ -246,17 +246,29 @@ fi
 
 export EDITOR=nvim
 
-export PATH="$PATH:$HOME/.pyenv/bin"
-eval "$(pyenv init -)"
-eval "$(pyenv virtualenv-init -)"
+# Check that pyenv exists before initializing it
+# This fixes a problem that occurs when this .zshrc is installed via the
+# dotfiles repo without installing pyenv first
+if [ -d $HOME/.pyenv ]; then
+    export PATH="$PATH:$HOME/.pyenv/bin"
+    eval "$(pyenv init -)"
+    eval "$(pyenv virtualenv-init -)"
+fi
 
-
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+# Check that nvm exists before initializing it
+# This fixes a problem that occurs when this .zshrc is installed via the
+# dotfiles repo without installing nvm first
+if [ -d $HOME/.nvm ]; then
+    export NVM_DIR="$HOME/.nvm"
+    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+    [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+fi
 
 export PATH="$HOME/bin:$PATH"
-export CDPATH="$CDPATH:$HOME/dev"
+
+if [ -d $HOME/dev ]; then
+    export CDPATH="$CDPATH:$HOME/dev"
+fi
 
 #export PAGER="/bin/sh -c \"col -b -x | nvim -R \
 #    -c 'set ft=man mouse=a nonumber t_te=' \
@@ -276,7 +288,9 @@ export MANPAGER="vim -c 'set nonu mouse=a' -c 'colors slate' -M +MANPAGER -"
 export BAT_PAGER=less
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
+# "If ~/.p10k.zsh doesn't not exist" 🙄... I think this was added by p10k...
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+
 # The following lines were added by compinstall
 
 zstyle ':completion:*' auto-description 'specify: %d'
