@@ -282,7 +282,9 @@ fi
 ## `!"` has special meaning in Zsh (man zshexpn)
 #export MANPAGER="nvim --clean +Man!"
 
-export MANPAGER="vim -c 'set nonu mouse=a' -c 'colors slate' -M +MANPAGER -"
+if which vim > /dev/null 2>&1; then
+    export MANPAGER="vim -c 'set nonu mouse=a' -c 'colors slate' -M +MANPAGER -"
+fi
 
 # Fix for the bat command
 export BAT_PAGER=less
