@@ -203,10 +203,24 @@ ZSH_THEME="powerlevel10k/powerlevel10k"
 plugins=(
   git
   vi-mode
-  nvm
   zsh-autosuggestions
   zsh-syntax-highlighting
 )
+
+# Check that nvm exists before initializing it
+# This fixes a problem that occurs when this .zshrc is installed via the
+# dotfiles repo without installing nvm first
+if [ -d $HOME/.nvm ]; then
+    # Add the nvm plugin for OhMyZsh
+    plugins+=(nvm)
+
+    # Initialize NVM
+    export NVM_DIR="$HOME/.nvm"
+    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+
+    # Load NVM bash completion
+    [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+fi
 
 source $ZSH/oh-my-zsh.sh
 
@@ -253,15 +267,6 @@ if [ -d $HOME/.pyenv ]; then
     export PATH="$PATH:$HOME/.pyenv/bin"
     eval "$(pyenv init -)"
     eval "$(pyenv virtualenv-init -)"
-fi
-
-# Check that nvm exists before initializing it
-# This fixes a problem that occurs when this .zshrc is installed via the
-# dotfiles repo without installing nvm first
-if [ -d $HOME/.nvm ]; then
-    export NVM_DIR="$HOME/.nvm"
-    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-    [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 fi
 
 export PATH="$HOME/bin:$PATH"
