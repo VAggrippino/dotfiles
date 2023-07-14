@@ -282,6 +282,9 @@ fi
 ## `!"` has special meaning in Zsh (man zshexpn)
 #export MANPAGER="nvim --clean +Man!"
 
+# Check that Vim's installed before setting the MANPAGER to use it
+# This is mostly for new system installs because nobody in their right mind
+# would use a system without Vim installed 🤪
 if which vim > /dev/null 2>&1; then
     export MANPAGER="vim -c 'set nonu mouse=a' -c 'colors slate' -M +MANPAGER -"
 fi
