@@ -1,2 +1,0 @@
-#!/usr/bin/bash
-/home/vaggrippino/bin/nvim.appimage $@

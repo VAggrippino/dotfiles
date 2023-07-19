@@ -1,2 +1,0 @@
-#!/usr/bin/bash
-/home/vaggrippino/bin/appimageupdatetool-x86_64.AppImage $@
