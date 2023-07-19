@@ -7,11 +7,6 @@ ohmyzsh_custom="omzcustom/.oh-my-zsh/custom"
 function update_ohmyzsh() {
     printf "Updating OhMyZsh submodule in $dotfiles/$ohmyzsh_submodule...\n\n"
 
-    # This shouldn't do anything if dotfiles was cloned properly, but might be
-    # helpful if the dotfiles repo was cloned without initing and updating the
-    # submodules
-    git -C "$dotfiles" init "$ohmyzsh_submodule"
-
     # Without --remote, git would only fetch the branch/commit that was latest
     # when the submodule was last added to the repo
     git -C "$dotfiles" submodule update --remote "$ohmyzsh_submodule"
