@@ -31,3 +31,18 @@
 [submodule "pyenv/.pyenv"]
 	path = pyenv/.pyenv
 	url = git@github.com:pyenv/pyenv.git
+[submodule "pyenv-plugins/.pyenv/plugins/pyenv-doctor"]
+	path = pyenv-plugins/.pyenv/plugins/pyenv-doctor
+	url = https://github.com/pyenv/pyenv-doctor.git
+[submodule "pyenv-plugins/.pyenv/plugins/pyenv-installer"]
+	path = pyenv-plugins/.pyenv/plugins/pyenv-installer
+	url = https://github.com/pyenv/pyenv-installer.git
+[submodule "pyenv-plugins/.pyenv/plugins/pyenv-update"]
+	path = pyenv-plugins/.pyenv/plugins/pyenv-update
+	url = https://github.com/pyenv/pyenv-update.git
+[submodule "pyenv-plugins/.pyenv/plugins/pyenv-virtualenv"]
+	path = pyenv-plugins/.pyenv/plugins/pyenv-virtualenv
+	url = https://github.com/pyenv/pyenv-virtualenv.git
+[submodule "pyenv-plugins/.pyenv/plugins/pyenv-which-ext"]
+	path = pyenv-plugins/.pyenv/plugins/pyenv-which-ext
+	url = https://github.com/pyenv/pyenv-which-ext.git
