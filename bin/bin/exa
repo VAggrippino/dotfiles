@@ -1,2 +1,2 @@
 #!/usr/bin/bash
-$HOME/.cargo/bin/exa --icons --classify $@
+/usr/bin/exa --icons --classify $@
