@@ -5,7 +5,7 @@ ohmyzsh_submodule="zsh/.oh-my-zsh"
 ohmyzsh_custom="omzcustom/.oh-my-zsh/custom"
 
 function update_ohmyzsh() {
-    printf "Updating OhMyZsh submodule in $dotfiles/$ohmyzsh_submodule...\n\n"
+    printf "### Updating OhMyZsh submodule in $dotfiles/$ohmyzsh_submodule...\n\n"
 
     # Without --remote, git would only fetch the branch/commit that was latest
     # when the submodule was last added to the repo
@@ -15,6 +15,7 @@ function update_ohmyzsh() {
 
     # Only update the dotfiles repo if the submodule update was successful
     if [[ $update_status -eq 0 ]]; then
+        printf "\n\n### Committing changes to dotfiles repo...\n\n"
         # If the OhMyZsh project has been updated, this will link its latest
         # commit to the dotfiles repo
         # If there were no updates, there will be a "nothing to commit"
@@ -28,7 +29,7 @@ function update_ohmyzsh() {
 }
 
 function update_omzcustom() {
-    printf "Updating OhMyZsh plugins...\n"
+    printf "\n\n### Updating OhMyZsh plugins...\n"
 
     local update_status
     local summary_update_status
@@ -39,8 +40,9 @@ function update_omzcustom() {
     prefix="$dotfiles/$ohmyzsh_custom"
     for fullpath in "$prefix"/plugins/* "$prefix"/themes/*; do
         relativepath=${fullpath#"$dotfiles/"}
+        componentname=${fullpath#"$prefix/"}
 
-        printf "Updating $relativepath ...\n"
+        printf "\n\n#### $relativepath ...\n"
 
         # This shouldn't do anything if dotfiles was cloned properly, but it
         # will be helpful if the repo was cloned without initing and updating
@@ -85,7 +87,7 @@ if [ -d $dotfiles ]; then
     # file
     perform_ohmyzsh_update=""
     if [[ ! -f "$ohmyzsh_update_file" ]]; then
-        echo "$ohmyzsh_update_file file not found."
+        echo "\n\n$ohmyzsh_update_file file not found."
         perform_ohmyzsh_update="yes"
 
     else
@@ -94,20 +96,21 @@ if [ -d $dotfiles ]; then
             local update_timestamp=$(stat --printf %Y $ohmyzsh_update_file)
             local current_timestamp=$(date +%s)
 
-            # Change DAYS to update more or less frequently
+            # Change days to update more or less frequently
             local days=14
             local seconds=$((days * 24 * 60 * 60))
 
             # If more than ${days} have passed since the last update, update the
             # submodule and plugins/themes, then update the updatetracking file
             if [[ $((current_timestamp - seconds)) -ge $update_timestamp ]]; then
-                printf "The OhMyZsh submodule hasn't been updated in at least $days days.\n"
+                printf "\n\nThe OhMyZsh submodule hasn't been updated in at least $days days.\n"
                 perform_ohmyzsh_update="yes"
             fi
         }
     fi
 
     if [[ "$perform_ohmyzsh_update" == "yes" ]]; then
+        printf "\n\n## OhMyZsh Update\n\n"
         if update_ohmyzsh && update_omzcustom; then
             ohmyzsh_update_message | tee $ohmyzsh_update_file
         else
