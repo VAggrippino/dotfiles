@@ -299,6 +299,10 @@ export BAT_PAGER=less
 # "If ~/.p10k.zsh doesn't not exist" 🙄... I think this was added by p10k...
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
+# Deno installation
+export DENO_INSTALL="/home/vaggrippino/.deno"
+export PATH="$DENO_INSTALL/bin:$PATH"
+
 # The following lines were added by compinstall
 
 zstyle ':completion:*' auto-description 'specify: %d'
