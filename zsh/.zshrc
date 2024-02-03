@@ -288,9 +288,9 @@ fi
 # Check that Vim's installed before setting the MANPAGER to use it
 # This is mostly for new system installs because nobody in their right mind
 # would use a system without Vim installed 🤪
-if which vim > /dev/null 2>&1; then
-    export MANPAGER="vim -c 'set nonu mouse=a' -c 'colors slate' -M +MANPAGER -"
-fi
+#if which vim > /dev/null 2>&1; then
+#    export MANPAGER="vim -c 'set nonu mouse=a' -c 'colors slate' -M +MANPAGER -"
+#fi
 
 # Fix for the bat command
 export BAT_PAGER=less
@@ -325,3 +325,6 @@ zstyle :compinstall filename '/home/vaggrippino/.zshrc'
 autoload -Uz compinit
 compinit
 # End of lines added by compinstall
+
+# To customize prompt, run `p10k configure` or edit ~/dotfiles/zsh/.p10k.zsh.
+[[ ! -f ~/dotfiles/zsh/.p10k.zsh ]] || source ~/dotfiles/zsh/.p10k.zsh
