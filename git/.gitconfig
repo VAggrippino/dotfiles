@@ -7,3 +7,5 @@
 
 [credential]
 	helper = store
+[commit]
+	template = ~/.config/git/commit_template.txt
